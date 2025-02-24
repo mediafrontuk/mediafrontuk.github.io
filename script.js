@@ -1,4 +1,3 @@
-<script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🚀 Postcode Validator Starting...");
     
@@ -37,4 +36,3 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Postcode Validator Successfully Processed!");
     alert("✅ Postcode Validator Successfully Processed!");
 });
-</script>
