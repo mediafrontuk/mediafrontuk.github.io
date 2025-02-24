@@ -4,12 +4,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let testPostcode = "AB12CD";
     console.log("📌 Test Postcode Before Processing:", testPostcode);
     
-    // Space removal using regex
-    testPostcode = testPostcode.replace(/\s/g, ""); // Fixed missing backslash
+    // Space removal (Double escaping the backslash)
+    testPostcode = testPostcode.replace(new RegExp("\\\\s", "g"), ""); 
     console.log("🔍 Postcode After Space Removal:", testPostcode);
     
-    // Define digit pattern correctly
-    const digitPattern = "\\d"; // Correctly represents digits in regex
+    // Define digit pattern with double escaping
+    const digitPattern = "\\\\d"; 
     
     // Updated regex patterns
     const patterns = [
@@ -38,4 +38,5 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Postcode Validator Successfully Processed!");
     alert("✅ Postcode Validator Successfully Processed!");
 });
+
 
