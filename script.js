@@ -1,41 +1,69 @@
-document.addEventListener("DOMContentLoaded", function () {    
+document.addEventListener("DOMContentLoaded", function () {
     console.log("🚀 Postcode Validator Starting...");
 
-    let testPostcode = "AB12 CD"; // Example postcode with space
-    console.log("📌 Test Postcode Before Processing:", testPostcode);
+    document.getElementById("contact-form").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    // Space removal using split/join (avoiding BD regex stripping issue)
-    testPostcode = testPostcode.split(" ").join("");     
-    console.log("🔍 Postcode After Space Removal:", testPostcode);
+        let postcode = document.getElementById("postcode").value.trim().toUpperCase();
+        postcode = postcode.split(" ").join(""); // Remove spaces
+        console.log("📌 Test Postcode Before Processing:", postcode);
 
-    // Corrected regex patterns using [0-9] instead of \d
-    const patterns = [
-        { type: "2L+3N+2L", regex: /^[A-Z]{2}[0-9]{3}[A-Z]{2}$/i },
-        { type: "2L+1N+1L+1N+2L", regex: /^[A-Z]{2}[0-9][A-Z][0-9][A-Z]{2}$/i },
-        { type: "1L+2N+1N+2L", regex: /^[A-Z][0-9]{2}[0-9][A-Z]{2}$/i },
-        { type: "2L+2N+2L", regex: /^[A-Z]{2}[0-9]{2}[A-Z]{2}$/i },
-        { type: "1L+1N+1L+1N+2L", regex: /^[A-Z][0-9][A-Z][0-9][A-Z]{2}$/i },
-        { type: "1L+1N+2L", regex: /^[A-Z][0-9]{2}[A-Z]$/i }
-    ];
+        // First validation: Allowed first part (area codes)
+        const validFirstParts = ["AB", "CD", "EF", "GH", "JK"];
+        const validSingleLetterParts = ["C", "E", "L", "S"];
 
-    // Validate postcode
-    let isValid = patterns.some(pattern => {
-        if (pattern.regex.test(testPostcode)) {
-            console.log(`✅ Matched Pattern: ${pattern.type}`);
-            return true;
+        let firstPartMatch = false;
+
+        if (postcode.length >= 2) {
+            const firstTwo = postcode.substring(0, 2);
+            const firstOne = postcode.charAt(0);
+            const secondChar = postcode.charAt(1);
+
+            if (validFirstParts.includes(firstTwo) || (validSingleLetterParts.includes(firstOne) && /\d/.test(secondChar))) {
+                firstPartMatch = true;
+            }
         }
-        return false;
+
+        if (!firstPartMatch) {
+            console.log("❌ INVALID: First part of postcode is not recognized.");
+            appendInvalidPostcode();
+            this.submit(); // Submit form with "INVALID POSTCODE" in message
+            return;
+        }
+
+        console.log("✅ First part of postcode is valid!");
+
+        // Second validation: UK postcode format check
+        const digitPattern = "\\d";
+        const patterns = [
+            { type: "2L+3N+2L", regex: new RegExp(`^[A-Z]{2}${digitPattern}{3}[A-Z]{2}$`, "i") },
+            { type: "2L+1N+1L+1N+2L", regex: new RegExp(`^[A-Z]{2}${digitPattern}[A-Z]${digitPattern}[A-Z]{2}$`, "i") },
+            { type: "1L+2N+1N+2L", regex: new RegExp(`^[A-Z]${digitPattern}{2}${digitPattern}[A-Z]{2}$`, "i") },
+            { type: "2L+2N+2L", regex: new RegExp(`^[A-Z]{2}${digitPattern}{2}[A-Z]{2}$`, "i") },
+            { type: "1L+1N+1L+1N+2L", regex: new RegExp(`^[A-Z]${digitPattern}[A-Z]${digitPattern}[A-Z]{2}$`, "i") },
+            { type: "1L+1N+2L", regex: new RegExp(`^[A-Z]${digitPattern}{2}[A-Z]$`, "i") }
+        ];
+
+        let isValid = patterns.some(pattern => pattern.regex.test(postcode));
+
+        if (!isValid) {
+            console.log("❌ INVALID: Does not match UK postcode format.");
+            appendInvalidPostcode();
+        } else {
+            console.log("✅ Postcode Validator Successfully Processed!");
+        }
+
+        this.submit(); // Submit form regardless
     });
 
-    if (!isValid) {
-        console.log("❌ INVALID: Does not match any UK postcode pattern.");
-        alert("❌ Invalid Postcode Format!");
-        return;
+    function appendInvalidPostcode() {
+        let messageField = document.getElementById("message");
+        let prefix = "[INVALID POSTCODE] ";
+
+        if (!messageField.value.startsWith(prefix)) { 
+            messageField.value = prefix + messageField.value;
+        }
+
+        console.log("📧 Prefilled Message:", messageField.value);
     }
-
-    console.log("✅ Postcode Validator Successfully Processed!");
-    alert("✅ Postcode Validator Successfully Processed!");
 });
-
-
-
