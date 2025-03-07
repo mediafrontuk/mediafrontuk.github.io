@@ -1,3 +1,4 @@
+console.log("🚀 Script loaded and running!");
 document.addEventListener("DOMContentLoaded", function () {
     let form = document.querySelector("form"); // Adjust this selector if needed
     let postcodeField = document.querySelector('input[name="postcode"]'); // Adjust based on actual field name
