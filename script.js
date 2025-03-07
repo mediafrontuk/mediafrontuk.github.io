@@ -1,39 +1,34 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🚀 Postcode Validator Starting...");
 
-    document.getElementById("contact-form").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        let postcode = document.getElementById("postcode").value.trim().toUpperCase();
-        postcode = postcode.split(" ").join(""); // Remove spaces
-        console.log("📌 Test Postcode Before Processing:", postcode);
-
-        // First validation: Allowed first part (area codes)
-        const validFirstParts = ["AB", "CD", "EF", "GH", "JK"];
-        const validSingleLetterParts = ["C", "E", "L", "S"];
-
-        let firstPartMatch = false;
-
-        if (postcode.length >= 2) {
-            const firstTwo = postcode.substring(0, 2);
-            const firstOne = postcode.charAt(0);
-            const secondChar = postcode.charAt(1);
-
-            if (validFirstParts.includes(firstTwo) || (validSingleLetterParts.includes(firstOne) && /\d/.test(secondChar))) {
-                firstPartMatch = true;
-            }
-        }
-
-        if (!firstPartMatch) {
-            console.log("❌ INVALID: First part of postcode is not recognized.");
-            appendInvalidPostcode();
-            this.submit(); // Submit form with "INVALID POSTCODE" in message
+    document.addEventListener("submit", function (event) {
+        let form = event.target;
+        let postcodeField = form.querySelector("input[name='postcode']");
+        let honeypotField = form.querySelector("input[name='phone_2']");
+        
+        if (!postcodeField || !honeypotField) {
+            console.warn("⚠️ Required fields not found in the form.");
             return;
         }
 
-        console.log("✅ First part of postcode is valid!");
+        let testPostcode = postcodeField.value.trim().toUpperCase();
+        console.log("📌 Test Postcode Before Processing:", testPostcode);
 
-        // Second validation: UK postcode format check
+        // Remove spaces (alternative to backslash issues in BD)
+        testPostcode = testPostcode.split(" ").join("");
+        console.log("🔍 Postcode After Space Removal:", testPostcode);
+
+        // Allowable prefixes
+        const validPrefixes = ["AB", "CD", "EF", "GH", "JK", "C", "E", "L", "S"];
+        
+        let isValidPrefix = validPrefixes.some(prefix => testPostcode.startsWith(prefix));
+        if (!isValidPrefix) {
+            console.log("❌ INVALID: Prefix not in the allowed list.");
+            honeypotField.value = "INVALID POSTCODE";
+            return;
+        }
+
+        // Postcode patterns (UK format)
         const digitPattern = "\\d";
         const patterns = [
             { type: "2L+3N+2L", regex: new RegExp(`^[A-Z]{2}${digitPattern}{3}[A-Z]{2}$`, "i") },
@@ -44,26 +39,19 @@ document.addEventListener("DOMContentLoaded", function () {
             { type: "1L+1N+2L", regex: new RegExp(`^[A-Z]${digitPattern}{2}[A-Z]$`, "i") }
         ];
 
-        let isValid = patterns.some(pattern => pattern.regex.test(postcode));
+        let isValid = patterns.some(pattern => {
+            if (pattern.regex.test(testPostcode)) {
+                console.log(`✅ Matched Pattern: ${pattern.type}`);
+                return true;
+            }
+            return false;
+        });
 
         if (!isValid) {
-            console.log("❌ INVALID: Does not match UK postcode format.");
-            appendInvalidPostcode();
+            console.log("❌ INVALID: Does not match any UK postcode pattern.");
+            honeypotField.value = "INVALID POSTCODE";
         } else {
             console.log("✅ Postcode Validator Successfully Processed!");
         }
-
-        this.submit(); // Submit form regardless
-    });
-
-    function appendInvalidPostcode() {
-        let messageField = document.getElementById("message");
-        let prefix = "[INVALID POSTCODE] ";
-
-        if (!messageField.value.startsWith(prefix)) { 
-            messageField.value = prefix + messageField.value;
-        }
-
-        console.log("📧 Prefilled Message:", messageField.value);
-    }
+    }, true);
 });
