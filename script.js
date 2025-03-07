@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("submit", function (event) {
         let form = event.target;
         let postcodeField = form.querySelector("input[name='postcode']");
-        let honeypotField = form.querySelector("input[name='phone_2']");
+        let honeypotField = form.querySelector("input[name='bd_hpc']");
         
         if (!postcodeField || !honeypotField) {
             console.warn("⚠️ Required fields not found in the form.");
