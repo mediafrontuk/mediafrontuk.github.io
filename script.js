@@ -1,16 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let postcodeField = document.querySelector('input[name="postcode"]');
+    let form = document.querySelector("form");
     let honeypotField = document.querySelector('input[name="bd_hpc"]');
 
-    if (postcodeField) {
-        console.log("✅ Postcode field found:", postcodeField);
+    if (form && honeypotField) {
+        form.addEventListener("submit", function () {
+            honeypotField.value = "INVALID POSTCODE";
+            console.log("🚀 Injected 'INVALID POSTCODE' at submission.");
+        });
     } else {
-        console.warn("❌ Postcode field NOT found!");
-    }
-
-    if (honeypotField) {
-        console.log("✅ Honeypot field found:", honeypotField);
-    } else {
-        console.warn("❌ Honeypot field NOT found!");
+        console.warn("⚠️ Form or honeypot field not found.");
     }
 });
