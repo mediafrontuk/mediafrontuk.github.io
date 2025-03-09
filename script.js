@@ -7,33 +7,45 @@ document.addEventListener("DOMContentLoaded", function () {
     if (honeypotField && postcodeField) {
         console.log("✅ Honeypot and postcode fields found! Preparing to validate...");
 
-        // Validate postcode format (UK Postcode regex example)
+        // UK postcode regex validation
         function isValidPostcode(postcode) {
             let postcodePattern = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
             return postcodePattern.test(postcode.trim());
         }
 
-        // Function to inject "INVALID POSTCODE" if validation fails
-        function validatePostcode() {
+        function validatePostcode(event) {
             let postcodeValue = postcodeField.value.trim();
-            
+            console.log(`📩 Postcode entered: "${postcodeValue}"`);
+
             if (!isValidPostcode(postcodeValue)) {
+                console.warn("❌ Invalid postcode detected! Blocking form submission...");
+                
                 honeypotField.value = "INVALID POSTCODE";
                 honeypotField.dispatchEvent(new Event("input", { bubbles: true }));
                 honeypotField.dispatchEvent(new Event("change", { bubbles: true }));
-                console.warn("❌ Invalid postcode detected! Form will be blocked.");
+                
+                event.preventDefault(); // 🚨 Stop form submission!
+                event.stopPropagation(); // 🚨 Ensure it does not propagate further!
+
+                return false;
             } else {
-                honeypotField.value = "";
-                console.log("✅ Valid postcode entered.");
+                console.log("✅ Valid postcode entered. Form can proceed.");
+                honeypotField.value = ""; // Reset honeypot field for valid postcodes
+                return true;
             }
         }
 
-        // Trigger validation when form is submitted
         let form = document.querySelector("form");
         if (form) {
             form.addEventListener("submit", function (event) {
-                validatePostcode();
+                console.log("🚀 Form submission detected...");
+                
+                let result = validatePostcode(event);
+                if (!result) {
+                    console.warn("⛔️ Submission blocked due to invalid postcode.");
+                }
             });
+
             console.log("🚀 Form submission listener added.");
         } else {
             console.warn("⚠️ No form found! Ensure script runs on the correct page.");
