@@ -7,17 +7,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (honeypotField && postcodeField) {
         console.log("✅ Honeypot and postcode fields found! Preparing to validate...");
 
-        // Ensure an error message exists
-        let errorMessage = document.createElement("div");
-        errorMessage.id = "postcode-error-msg"; // Unique ID for debugging
-        errorMessage.style.color = "red";
-        errorMessage.style.fontWeight = "bold";
-        errorMessage.style.marginTop = "5px";
-        errorMessage.style.display = "none";
-        errorMessage.textContent = "❌ Invalid postcode entered. Please check and try again.";
-        
-        // Append error message after postcode input
-        if (!document.getElementById("postcode-error-msg")) {
+        // Check if error message already exists
+        let errorMessage = document.getElementById("postcode-error-msg");
+        if (!errorMessage) {
+            errorMessage = document.createElement("div");
+            errorMessage.id = "postcode-error-msg";
+            errorMessage.style.color = "red";
+            errorMessage.style.fontWeight = "bold";
+            errorMessage.style.marginTop = "5px";
+            errorMessage.style.display = "none"; // Start hidden
+            errorMessage.textContent = "❌ Invalid postcode. Please check and try again.";
             postcodeField.parentNode.appendChild(errorMessage);
         }
 
@@ -30,8 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let postcodeValue = postcodeField.value.trim();
             console.log(`📩 Postcode entered: "${postcodeValue}"`);
 
-            // Use localStorage instead of sessionStorage
-            let logData = localStorage.getItem("formLogs") || "";
+            let logData = sessionStorage.getItem("formLogs") || "";
             logData += `\n📩 Postcode: "${postcodeValue}"\n`;
 
             if (!isValidPostcode(postcodeValue)) {
@@ -39,20 +37,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 honeypotField.value = "INVALID POSTCODE";
 
                 event.preventDefault(); // 🚨 Stop form submission!
-                event.stopPropagation(); // 🚨 Ensure it does not propagate further!
+                event.stopImmediatePropagation(); // 🚨 Make sure BD validation doesn't override
+                event.stopPropagation(); // 🚨 Fully halt event propagation
                 
-                errorMessage.style.display = "block"; // Show visible error
+                errorMessage.style.display = "block"; // Show error
                 logData += "⛔️ Submission blocked due to invalid postcode.\n";
-                
-                localStorage.setItem("formLogs", logData); // Save logs
+
+                sessionStorage.setItem("formLogs", logData); // Store log BEFORE page changes
                 return false;
             } else {
                 console.log("✅ Valid postcode entered. Form can proceed.");
                 honeypotField.value = ""; // Reset honeypot field for valid postcodes
                 errorMessage.style.display = "none"; // Hide error
                 logData += "✅ Valid postcode - Form submitted.\n";
-                
-                localStorage.setItem("formLogs", logData); // Save logs
+
+                sessionStorage.setItem("formLogs", logData); // Save log before redirect
                 return true;
             }
         }
