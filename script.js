@@ -7,14 +7,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (honeypotField && postcodeField) {
         console.log("✅ Honeypot and postcode fields found! Preparing to validate...");
 
-        // Create a visible error message (if needed)
+        // Ensure an error message exists
         let errorMessage = document.createElement("div");
+        errorMessage.id = "postcode-error-msg"; // Unique ID for debugging
         errorMessage.style.color = "red";
         errorMessage.style.fontWeight = "bold";
         errorMessage.style.marginTop = "5px";
         errorMessage.style.display = "none";
         errorMessage.textContent = "❌ Invalid postcode entered. Please check and try again.";
-        postcodeField.parentNode.appendChild(errorMessage);
+        
+        // Append error message after postcode input
+        if (!document.getElementById("postcode-error-msg")) {
+            postcodeField.parentNode.appendChild(errorMessage);
+        }
 
         function isValidPostcode(postcode) {
             let postcodePattern = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
@@ -25,8 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
             let postcodeValue = postcodeField.value.trim();
             console.log(`📩 Postcode entered: "${postcodeValue}"`);
 
-            // Store logs in sessionStorage to check after redirection
-            let logData = sessionStorage.getItem("formLogs") || "";
+            // Use localStorage instead of sessionStorage
+            let logData = localStorage.getItem("formLogs") || "";
             logData += `\n📩 Postcode: "${postcodeValue}"\n`;
 
             if (!isValidPostcode(postcodeValue)) {
@@ -39,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 errorMessage.style.display = "block"; // Show visible error
                 logData += "⛔️ Submission blocked due to invalid postcode.\n";
                 
-                sessionStorage.setItem("formLogs", logData); // Save logs
+                localStorage.setItem("formLogs", logData); // Save logs
                 return false;
             } else {
                 console.log("✅ Valid postcode entered. Form can proceed.");
@@ -47,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 errorMessage.style.display = "none"; // Hide error
                 logData += "✅ Valid postcode - Form submitted.\n";
                 
-                sessionStorage.setItem("formLogs", logData); // Save logs
+                localStorage.setItem("formLogs", logData); // Save logs
                 return true;
             }
         }
