@@ -1,12 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("🚀 Widget Script Loaded!");
-
     let postcodeField = document.querySelector('input[name="postcode"]');
     let honeypotField = document.querySelector('input[name="bd_hpc"]');
 
     if (postcodeField && honeypotField) {
-        console.log("✅ Postcode and honeypot fields found!");
-
         const validTwoLetters = ["AB", "AL", "BA", "BB", "BD", "BH", "BL", "BN", "BR", "BS", "BT", "CA", "CB", "CF", "CH", "CM", "CO", "CR", "CT", "CV", "CW", "DA", "DD", "DE", "DG", "DH", "DL", "DN", "DT", "DY", "EC", "EH", "EN", "EX", "FK", "FY", "GL", "GU", "HA", "HD", "HG", "HP", "HR", "HS", "HU", "HX", "IG", "IP", "IV", "KA", "KT", "KW", "KY", "LA", "LD", "LE", "LL", "LN", "LS", "LU", "ME", "MK", "ML", "NE", "NG", "NN", "NP", "NR", "NW", "OL", "OX", "PA", "PE", "PH", "PL", "PO", "PR", "RG", "RH", "RM", "SA", "SE", "SG", "SK", "SL", "SM", "SN", "SO", "SP", "SR", "SS", "ST", "SW", "SY", "TA", "TD", "TF", "TN", "TQ", "TR", "TS", "TW", "UB", "WA", "WC", "WD", "WF", "WN", "WR", "WS", "WV", "YO", "ZE"];
         const validSingleLetters = ["B", "E", "G", "L", "M", "N", "S", "W"];
 
@@ -39,16 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
         postcodeField.addEventListener("input", function () {
             let postcodeValue = postcodeField.value.trim();
             if (postcodeValue) {
-                if (!validatePostcode(postcodeValue)) {
-                    console.warn("⛔ Invalid postcode entered!");
-                    honeypotField.value = "INVALID POSTCODE";
-                } else {
-                    console.log("✅ Postcode valid.");
-                    honeypotField.value = "";
-                }
+                honeypotField.value = validatePostcode(postcodeValue) ? "" : "INVALID POSTCODE";
             }
         });
-    } else {
-        console.error("❌ Fields not found!");
     }
 });
