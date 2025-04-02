@@ -31,17 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
-        // Validate on input change
         postcodeField.addEventListener("input", function () {
             let postcodeValue = postcodeField.value.trim();
             if (postcodeValue) {
-                if (validatePostcode(postcodeValue)) {
-                    honeypotField.value = ""; // Clear for valid postcode
-                } else {
-                    honeypotField.value = "EMAIL_DELIVERY_SUCCESS!"; // Reset to default for invalid postcode
-                }
+                honeypotField.value = validatePostcode(postcodeValue) ? "" : "EMAIL_DELIVERY_SUCCESS!";
             } else {
-                honeypotField.value = "EMAIL_DELIVERY_SUCCESS!"; // Reset if empty
+                honeypotField.value = "EMAIL_DELIVERY_SUCCESS!";
             }
         });
     }
