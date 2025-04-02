@@ -35,7 +35,13 @@ document.addEventListener("DOMContentLoaded", function () {
         postcodeField.addEventListener("input", function () {
             let postcodeValue = postcodeField.value.trim();
             if (postcodeValue) {
-                honeypotField.value = validatePostcode(postcodeValue) ? "" : "INVALID POSTCODE";
+                if (validatePostcode(postcodeValue)) {
+                    honeypotField.value = ""; // Clear for valid postcode
+                } else {
+                    honeypotField.value = "EMAIL_DELIVERY_SUCCESS!"; // Reset to default for invalid postcode
+                }
+            } else {
+                honeypotField.value = "EMAIL_DELIVERY_SUCCESS!"; // Reset if empty
             }
         });
     }
